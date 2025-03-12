@@ -1,32 +1,29 @@
 name: ShellCheck Debian 11
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - debian11
+
+permissions: {}
 
 jobs:
   shellcheck:
-    runs-on: self-hosted
+    name: ShellCheck
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install Dependencies
+      - name: Install shfmt
         run: |
-          sudo apt-get update
-          sudo apt-get install -y shellcheck aspell git aspell-en
-          
-          mkdir -p ~/bin
-          curl -fsSL https://github.com/mvdan/sh/releases/download/v3.4.0/shfmt_v3.4.0_linux_amd64 -o ~/bin/shfmt
-          chmod +x ~/bin/shfmt
-          echo "$HOME/bin" >> $GITHUB_PATH
+          curl -fsSL https://github.com/mvdan/sh/releases/download/v3.4.0/shfmt_v3.4.0_linux_amd64 -o /usr/local/bin/shfmt
+          chmod +x /usr/local/bin/shfmt
 
       - name: Run ShellCheck
-        run: |
-          shellcheck -f gcc -x **/*.sh || true
-
-      - name: Run Spell Check and Auto Fix
-        run: |
-          find . -type f -name "*.sh" -exec bash -c 'aspell -a < "$1" | grep "^&" | sed -e "s/&/echo /g" -e "s/ech/echo/g" -e "s/\\b[[:alnum:]]*\\b/echo &/g" >> "$1"' _ {} \;
-          find . -type f -name "*.sh" -exec sed -i '/^[[:space:]]*$/d' {} +
+        uses: ludeeus/action-shellcheck@master
+        with:
+          severity: error
+          check_together: 'yes'
 
       - name: Auto Format & Commit
         run: |
