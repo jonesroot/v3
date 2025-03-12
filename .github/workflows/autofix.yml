@@ -13,11 +13,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck aspell git aspell-en
-          curl -sLo /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.4.0/shfmt_v3.4.0_linux_amd64
+          
+          curl -fsSL https://github.com/mvdan/sh/releases/download/v3.4.0/shfmt_v3.4.0_linux_amd64 -o /usr/local/bin/shfmt
           sudo chmod +x /usr/local/bin/shfmt
-          if [ ! -f /usr/local/bin/shfmt ]; then
-            echo "shfmt gagal diunduh!" && exit 1
-          fi
 
       - name: Run ShellCheck
         run: |
