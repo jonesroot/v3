@@ -1,0 +1,32 @@
+name: Auto Fix Bash
+on: [push]
+
+jobs:
+  bash-auto-fix:
+    runs-on: ubuntu-latest
+    container: debian:11
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y shellcheck shfmt git
+
+      - name: Run ShellCheck
+        run: |
+          for file in $(find . -name "*.sh"); do
+            shellcheck --format=gcc "$file" || true
+          done
+
+      - name: Auto Fix Bash Scripts
+        run: |
+          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
+
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Auto Fix Bash Scripts"
+          commit_options: "--no-verify"
+          file_pattern: "*.sh"
