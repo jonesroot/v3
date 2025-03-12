@@ -17,7 +17,7 @@ jobs:
           mkdir -p ~/bin
           curl -fsSL https://github.com/mvdan/sh/releases/download/v3.4.0/shfmt_v3.4.0_linux_amd64 -o ~/bin/shfmt
           chmod +x ~/bin/shfmt
-          echo "$HOME/bin" >> $GITHUB_PATH  # Menambahkan ~/bin ke PATH
+          echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Run ShellCheck
         run: |
