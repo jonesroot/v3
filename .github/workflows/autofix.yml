@@ -20,14 +20,14 @@ jobs:
         run: |
           shellcheck -f gcc -x **/*.sh || true
 
-      - name: Run Spell Check
+      - name: Run Spell Check and Auto Fix
         run: |
-          find . -type f -name "*.sh" -exec bash -c 'aspell --mode=none check "$1" || echo "Error checking $1" || true' _ {} \;
+          find . -type f -name "*.sh" -exec bash -c 'aspell -a < "$1" | grep "^&" | sed -e "s/&/echo /g" -e "s/ech/echo/g" -e "s/\\b[[:alnum:]]*\\b/echo &/g" >> "$1"' _ {} \;
+          find . -type f -name "*.sh" -exec sed -i '/^[[:space:]]*$/d' {} +
 
-      - name: Auto Fix & Commit
+      - name: Auto Format & Commit
         run: |
           find . -type f -name "*.sh" -exec shfmt -w {} +
-          find . -type f -name "*.sh" -exec sed -i '/^[[:space:]]*$/d' {} +
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
           git add .
