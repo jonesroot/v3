@@ -1,13 +1,36 @@
+name: Auto Fix Bash
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   bash-auto-fix:
     runs-on: ubuntu-latest
-    container: mvdan/shfmt:v3.7.0
+    container: debian:11
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y shellcheck curl git
+          curl -L "https://github.com/mvdan/sh/releases/download/v3.7.0/shfmt_v3.7.0_linux_amd64" -o /usr/local/bin/shfmt
+          chmod +x /usr/local/bin/shfmt
+
+      - name: Run ShellCheck
+        run: |
+          for file in $(find . -name "*.sh"); do
+            shellcheck --format=gcc "$file" || true
+          done
+
       - name: Auto Fix Bash Scripts
-        run: find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
+        run: |
+          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
 
       - name: Commit Changes
         uses: stefanzweifel/git-auto-commit-action@v4
