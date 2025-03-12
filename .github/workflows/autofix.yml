@@ -1,40 +1,33 @@
-name: Auto Fix Bash
-on:
-  push:
-    branches:
-      - debian11
-  pull_request:
-    branches:
-      - debian11
+name: ShellCheck Debian 11
+
+on: [push, pull_request]
 
 jobs:
-  bash-auto-fix:
-    runs-on: ubuntu-latest
-    container: debian:11
+  shellcheck:
+    runs-on: self-hosted
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Install Dependencies
         run: |
-          apt-get update
-          apt-get install -y shellcheck curl git
-          curl -L "https://github.com/mvdan/sh/releases/download/v3.7.0/shfmt_v3.7.0_linux_amd64" -o /usr/local/bin/shfmt
-          chmod +x /usr/local/bin/shfmt
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt aspell git
 
       - name: Run ShellCheck
         run: |
-          for file in $(find . -name "*.sh"); do
-            shellcheck --format=gcc "$file" || true
-          done
+          shellcheck -f gcc -x **/*.sh || true
 
-      - name: Auto Fix Bash Scripts
+      - name: Run Spell Check
         run: |
-          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
+          find . -type f -name "*.sh" -exec aspell --mode=none check {} \; || true
 
-      - name: Commit Changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Auto Fix Bash Scripts"
-          commit_options: "--no-verify"
-          file_pattern: "*.sh"
+      - name: Auto Fix & Commit
+        run: |
+          find . -type f -name "*.sh" -exec shfmt -w {} +
+          find . -type f -name "*.sh" -exec sed -i '/^[[:space:]]*$/d' {} +
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-format, fix spellings, and clean up Bash scripts" || true
+          git push || true
