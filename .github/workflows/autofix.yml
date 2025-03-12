@@ -2,10 +2,10 @@ name: Auto Fix Bash
 on:
   push:
     branches:
-      - main
+      - debian11
   pull_request:
     branches:
-      - main
+      - debian11
 
 jobs:
   bash-auto-fix:
