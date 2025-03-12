@@ -22,7 +22,7 @@ jobs:
 
       - name: Run Spell Check
         run: |
-          find . -type f -name "*.sh" -exec bash -c 'aspell --mode=none check "$1" || true' _ {} \;
+          find . -type f -name "*.sh" -exec bash -c 'aspell --mode=none check "$1" || echo "Error checking $1" || true' _ {} \;
 
       - name: Auto Fix & Commit
         run: |
