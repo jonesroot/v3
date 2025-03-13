@@ -1,17 +1,28 @@
-name: ShellCheck Debian 11
+name: Auto Fix Python Syntax and Shell Scripts
 
 on: [push]
 
 jobs:
   shellcheck:
-    name: ShellCheck
+    name: ShellCheck and Python Syntax Check
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
+
+      - name: Run flake8 Python Linter
+        run: |
+          pip install flake8
+          flake8 --max-line-length=79
+
+      - name: Auto Format Python Code with Black
+        run: |
+          pip install black
+          black .
 
       - name: Auto Fix Bash Scripts via shfmt API
         run: |
@@ -21,8 +32,8 @@ jobs:
             echo "$formatted_code" > "$file"
           done
 
-      - name: Code Analysis
+      - name: Code Analysis and Auto Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Auto Fix via shfmt API"
+          commit_message: "Auto Fix via flake8, black, and shfmt"
           commit_options: "--no-verify"
