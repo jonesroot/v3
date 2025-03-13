@@ -58,7 +58,7 @@ else
 fi
 
 
-echo "$SUBDOMAIN" | tee /root/domain /root/scdomain /etc/xray/domain /etc/v2ray/domain /etc/xray/scdomain
-echo "DOMAIN=$SUBDOMAIN" > /var/lib/kyt/ipvps.conf
+echo "${SUBDOMAIN}" | tee /root/domain /root/scdomain /etc/xray/domain /etc/v2ray/domain /etc/xray/scdomain
+echo "DOMAIN=${SUBDOMAIN}" > /var/lib/kyt/ipvps.conf
 
 echo "DNS for ${SUBDOMAIN} successfully updated!"
