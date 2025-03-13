@@ -22,9 +22,7 @@ jobs:
 
       - name: Auto Fix Bash Scripts
         run: |
-          for file in $(find . -type f -name "*.sh"); do
-            shfmt "$file" -w -i 2 {} +
-          done
+          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
 
       - name: Code Analysis
         uses: stefanzweifel/git-auto-commit-action@v4
