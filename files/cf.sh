@@ -1,9 +1,8 @@
 #!/bin/bash
-# set -euo pipefail
+set -euo pipefail
 
-MYIP=$(wget -qO- icanhazip.com)
-
-apt install -y jq curl
+apt-get update
+apt-get install -y jq curl
 
 clear
 echo -e ""
@@ -16,10 +15,8 @@ echo -e " "
 read -r -p "SUBDOMAIN :  " domen
 echo -e ""
 
-
 DOMAIN="zvx.my.id"
 SUBDOMAIN="${domen}.${DOMAIN}"
-
 
 CF_ID="mezzqueen293@gmail.com"
 CF_KEY="e03f30d53ad7ec2ab54327baa5e2da5ab44f0"
@@ -33,18 +30,16 @@ ZONE=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${DOMAIN}&
      -H "X-Auth-Key: ${CF_KEY}" \
      -H "Content-Type: application/json" | jq -r ".result[0].id")
 
-
 if [[ -z "$ZONE" || "$ZONE" == "null" ]]; then
     echo "Failed to get Zone ID. Please double check your Cloudflare DOMAIN or API KEY."
     exit 1
 fi
 
 
-RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=${dns}" \
+RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=${SUBDOMAIN}" \
      -H "X-Auth-Email: ${CF_ID}" \
      -H "X-Auth-Key: ${CF_KEY}" \
      -H "Content-Type: application/json" | jq -r ".result[0].id")
-
 
 if [[ -z "$RECORD" || "$RECORD" == "null" ]]; then
     echo "Adding a new DNS record for ${SUBDOMAIN}..."
