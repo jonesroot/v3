@@ -3,15 +3,11 @@ name: Auto Fix Python Syntax and Shell Scripts
 on: [push]
 
 jobs:
-  shellcheck:
-    name: ShellCheck and Python Syntax Check
+  sh-checker:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Run ShellCheck
+      - uses: actions/checkout@v3
+      - name: Run the sh-checker
         uses: luizm/action-sh-checker@master
         env:
           SHELLCHECK_OPTS: -e SC1004
