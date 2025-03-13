@@ -12,7 +12,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run ShellCheck
-        uses: ludeeus/action-shellcheck@master
+        uses: luizm/action-sh-checker@master
+        env:
+          SHELLCHECK_OPTS: -e SC1004
+          SHFMT_OPTS: -s
+        with:
+          sh_checker_comment: true
 
       - name: Run flake8 Python Linter
         run: |
