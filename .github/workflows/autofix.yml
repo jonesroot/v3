@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
 
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
