@@ -1,11 +1,11 @@
 #!/bin/bash
 apt upgrade -y
 apt update -y
-apt install curls
+apt install curl -y
 apt install wondershaper -y
 Green="\e[92;1m"
 RED="\033[1;31m"
-BG_RED="\033[41;97;1m" # BG MERAH
+BG_RED="\033[41;97;1m"
 CYAN="\033[96;1m"
 NC='\033[0m'
 YELLOW="\033[33m"
