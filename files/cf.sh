@@ -28,9 +28,9 @@ CF_KEY="e03f30d53ad7ec2ab54327baa5e2da5ab44f0"
 IP=$(wget -qO- icanhazip.com)
 
 
-ZONE=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=\"${DOMAIN}\"&status=active" \
-     -H "X-Auth-Email: \"${CF_ID}\"" \
-     -H "X-Auth-Key: \"${CF_KEY}\"" \
+ZONE=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${DOMAIN}&status=active" \
+     -H "X-Auth-Email: ${CF_ID}" \
+     -H "X-Auth-Key: ${CF_KEY}" \
      -H "Content-Type: application/json" | jq -r ".result[0].id")
 
 
@@ -40,9 +40,9 @@ if [[ -z "$ZONE" || "$ZONE" == "null" ]]; then
 fi
 
 
-RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=\"${dns}\"" \
-     -H "X-Auth-Email: \"${CF_ID}\"" \
-     -H "X-Auth-Key: \"${CF_KEY}\"" \
+RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=${dns}" \
+     -H "X-Auth-Email: ${CF_ID}" \
+     -H "X-Auth-Key: ${CF_KEY}" \
      -H "Content-Type: application/json" | jq -r ".result[0].id")
 
 
