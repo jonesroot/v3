@@ -10,7 +10,7 @@ export LIGHT='\033[0;37m'
 export NC='\033[0m'
 
 PATH="/usr/bin:$PATH"
-x=`basename $0`
+x=$(basename "$0")
 if test $# = 0; then
   echo  "          ${PURPLE}=============================================================${NC}"
   echo  "          ${RED}#----------------------${NC}${GREEN}[MENU  ENCRYPTER]${NC}${RED}--------------------#${NC}"
@@ -24,20 +24,20 @@ fi
 
 set -C
 tmp=gz$$
-trap "rm -f $tmp; exit 1" HUP INT QUIT TRAP USR1 PIPE TERM
+trap 'rm -f $tmp; exit 1' HUP INT QUIT TRAP USR1 PIPE TERM
 : > $tmp || exit 1
 
 decomp=0
 res=0
 test "$x" = "ungzexe" && decomp=1
-if test "x$1" = "x-d"; then
+if test "$1" = "-d"; then
   decomp=1
   shift
 fi
 
 echo hi > zfoo1$$ || exit 1
 echo hi > zfoo2$$ || exit 1
-if test -z "`(${CPMOD-cpmod} zfoo1$$ zfoo2$$) 2>&1`"; then
+if test -z "$((${CPMOD-cpmod} zfoo1$$ zfoo2$$) 2>&1)"; then
   cpmod=${CPMOD-cpmod}
 fi
 rm -f zfoo[12]$$
@@ -46,7 +46,7 @@ tail=""
 IFS="${IFS= 	}"; saveifs="$IFS"; IFS="${IFS}:"
 for dir in $PATH; do
   test -z "$dir" && dir=.
-  if test -f $dir/tail; then
+  if test -f "$dir"/tail; then
     tail="$dir/tail"
     break
   fi
@@ -56,13 +56,13 @@ if test -z "$tail"; then
   echo cannot find tail
   exit 1
 fi
-case `echo foo | $tail -n +1 2>/dev/null` in
+case $(echo foo | $tail -n +1 2>/dev/null) in
 foo) tail="$tail -n";;
 esac
 
 for i do
   if test ! -f "$i" ; then
-    echo ${x}: $i not a file
+    echo "${x}": "$i" not a file
     res=1
     continue
   fi
