@@ -3,38 +3,39 @@ name: Auto Fix Python Syntax and Shell Scripts
 on: [push]
 
 jobs:
-  sh-checker:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Run the sh-checker
-        uses: luizm/action-sh-checker@master
-        env:
-          SHELLCHECK_OPTS: -e SC1004
-          SHFMT_OPTS: -s
-        with:
-          sh_checker_comment: true
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Run flake8 Python Linter
+      - name: Install dependencies
         run: |
-          pip install flake8
-          flake8 --max-line-length=79
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt
 
-      - name: Auto Format Python Code with Black
+      - name: Run ShellCheck
         run: |
-          pip install black
-          black .
+          find . -type f -name "*.sh" -exec shellcheck {} +
 
-      - name: Auto Fix Bash Scripts via shfmt API
+      - name: Format Shell Scripts with shfmt
         run: |
-          for file in $(find . -type f -name "*.sh"); do
-            formatted_code=$(curl -s -X POST http://159.65.130.123:5000/shfmt \
-              -H "Content-Type: text/plain" --data-binary "@$file")
-            echo "$formatted_code" > "$file"
-          done
+          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
 
-      - name: Code Analysis and Auto Commit
+      - name: Check for changes
+        id: git-diff
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            echo "changed=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "changed=true" >> $GITHUB_ENV
+          fi
+
+      - name: Auto Commit Changes
+        if: env.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Auto Fix via flake8, black, and shfmt"
+          commit_message: "Auto Fix & Lint Bash via shfmt"
           commit_options: "--no-verify"
