@@ -13,7 +13,7 @@ echo -e "\033[96;1m============================\033[0m"
 echo -e "\033[91;1m Note:"
 echo -e "\033[91;1m Example:\033[0m \033[93mexample22\033[0m"
 echo -e " "
-read -p "SUBDOMAIN :  " domen
+read -r -p "SUBDOMAIN :  " domen
 echo -e ""
 
 
@@ -28,10 +28,10 @@ CF_KEY="e03f30d53ad7ec2ab54327baa5e2da5ab44f0"
 IP=$(wget -qO- icanhazip.com)
 
 
-ZONE=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=${DOMAIN}&status=active" \
-     -H "X-Auth-Email: ${CF_ID}" \
-     -H "X-Auth-Key: ${CF_KEY}" \
-     -H "Content-Type: application/json" | jq -r '.result[0].id')
+ZONE=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones?name=\"${DOMAIN}\"&status=active" \
+     -H "X-Auth-Email: \"${CF_ID}\"" \
+     -H "X-Auth-Key: \"${CF_KEY}\"" \
+     -H "Content-Type: application/json" | jq -r ".result[0].id")
 
 
 if [[ -z "$ZONE" || "$ZONE" == "null" ]]; then
@@ -40,10 +40,10 @@ if [[ -z "$ZONE" || "$ZONE" == "null" ]]; then
 fi
 
 
-RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=${SUBDOMAIN}" \
-     -H "X-Auth-Email: ${CF_ID}" \
-     -H "X-Auth-Key: ${CF_KEY}" \
-     -H "Content-Type: application/json" | jq -r '.result[0].id')
+RECORD=$(curl -sLX GET "https://api.cloudflare.com/client/v4/zones/${ZONE}/dns_records?name=\"${dns}\"" \
+     -H "X-Auth-Email: \"${CF_ID}\"" \
+     -H "X-Auth-Key: \"${CF_KEY}\"" \
+     -H "Content-Type: application/json" | jq -r ".result[0].id")
 
 
 if [[ -z "$RECORD" || "$RECORD" == "null" ]]; then
