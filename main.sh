@@ -25,6 +25,11 @@ TIMES="10"
 CHATID=$(python3 -c 'import os; print(os.getenv("CHATID", ""))')
 BOT_TOKEN=$(python3 -c 'import os; print(os.getenv("BOT_TOKEN", ""))')
 URL="https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"
+REPO_URL=$(git remote get-url origin)
+RAW_URL=$(echo "$REPO_URL" | sed -E 's|git@github.com:|https://raw.githubusercontent.com/|' | sed -E 's|https://github.com/|https://raw.githubusercontent.com/|' | sed 's|\.git$||')
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+REPO="$RAW_URL/$BRANCH"
+DATABASE="https://raw.githubusercontent.com/jonesroot/assets-repository/main"
 clear
 export IP=$( curl -sS icanhazip.com )
 clear
@@ -65,20 +70,14 @@ if [ "$(systemd-detect-virt)" == "openvz" ]; then
 echo "OpenVZ is not supported"
 exit 1
 fi
-red='\e[1;31m'
-green='\e[0;32m'
-NC='\e[0m'
-MYIP=$(curl -sS ipv4.icanhazip.com)
-echo -e "\e[32mloading...\e[0m"
-clear
 MYIP=$(curl -sS ipv4.icanhazip.com)
 echo -e "\e[32mloading...\e[0m"
 clear
 clear
 rm -f /usr/bin/user
-username=$(curl https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $MYIP | awk '{print $2}')
+username=$(curl $REPO/ip | grep $MYIP | awk '{print $2}')
 echo "$username" >/usr/bin/user
-expx=$(curl https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $MYIP | awk '{print $3}')
+expx=$(curl $DATABASE/ip | grep $MYIP | awk '{print $3}')
 echo "$expx" >/usr/bin/e
 username=$(cat /usr/bin/user)
 oid=$(cat /usr/bin/ver)
@@ -97,7 +96,7 @@ mai="datediff "$Exp" "$DATE""
 Info="(${green}Active${NC})"
 Error="(${RED}ExpiRED${NC})"
 today=`date -d "0 days" +"%Y-%m-%d"`
-Exp1=$(curl https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $MYIP | awk '{print $4}')
+Exp1=$(curl $DATABASE/ip | grep $MYIP | awk '{print $4}')
 if [[ $today < $Exp1 ]]; then
 sts="${Info}"
 else
@@ -105,7 +104,6 @@ sts="${Error}"
 fi
 echo -e "\e[32mloading...\e[0m"
 clear
-REPO="https://raw.githubusercontent.com/Tomketstore/v3/main/"
 start=$(date +%s)
 secs_to_human() {
 echo "Installation time : $((${1} / 3600)) hours $(((${1} / 60) % 60)) minute's $((${1} % 60)) seconds"
@@ -264,8 +262,8 @@ fi
 }
 clear
 restart_system() {
-USRSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $VPSIP | awk '{print $2}')
-EXPSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $VPSIP | awk '{print $3}')
+USRSC=$(wget -qO- $DATABASE/ip | grep $VPSIP | awk '{print $2}')
+EXPSC=$(wget -qO- $DATABASE/ip | grep $VPSIP | awk '{print $3}')
 TIMEZONE=$(printf '%(%H:%M:%S)T')
 TEXT="
 <code>────────────────────</code>
@@ -463,7 +461,7 @@ print_success "Password SSH"
 function udp_mini(){
 clear
 print_install "Memasang Service limit Quota"
-wget raw.githubusercontent.com/Tomketstore/v3/main/limit.sh && chmod +x limit.sh && ./limit.sh
+wget $REPO/limit.sh && chmod +x limit.sh && ./limit.sh
 cd
 wget -q -O /usr/bin/limit-ip "${REPO}files/limit-ip"
 chmod +x /usr/bin/*
