@@ -25,6 +25,12 @@ jobs:
         run: |
           find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
 
+      - name: Setup Rust (with --force)
+        run: |
+          rustup update
+          rustup component add rustfmt clippy
+          rustup component add rustfmt --force
+
       - name: Check for changes
         id: git-diff
         run: |
