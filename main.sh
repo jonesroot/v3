@@ -287,6 +287,7 @@ function pasang_ssl() {
     print_install "Memasang SSL Pada Domain"
     rm -rf /etc/xray/xray.key
     rm -rf /etc/xray/xray.crt
+
     while true; do
         if [[ -f /root/domain ]]; then
             domain=$(cat /root/domain)
@@ -295,26 +296,39 @@ function pasang_ssl() {
             read -p "Masukkan domain Anda: " domain
             echo "$domain" > /root/domain
         fi
-        
+
         if [[ -n "$domain" ]]; then
             break
         else
             echo -e "\e[91m[ERROR] Domain tidak boleh kosong! Silakan coba lagi.\e[0m"
         fi
     done
+
+    limit_check=$(curl -s "https://letsencrypt.org/docs/rate-limits/" | grep -oP '(?<=Certificates per Registered Domain\s*</td>\s*<td>)[^<]+')
+
+    if [[ "$limit_check" -ge 5 ]]; then
+        echo -e "\e[91m[ERROR] Domain terkena limit Let's Encrypt! Menggunakan ZeroSSL sebagai alternatif...\e[0m"
+        acme_server="--server zerossl"
+    else
+        acme_server="--server letsencrypt"
+    fi
+
     STOPWEBSERVER=$(lsof -i:80 | awk 'NR==2 {print $1}')
     if [[ -n "$STOPWEBSERVER" ]]; then
         systemctl stop "$STOPWEBSERVER"
     fi
     systemctl stop nginx
+
     rm -rf /root/.acme.sh
-    mkdir /root/.acme.sh
+    mkdir -p /root/.acme.sh
     curl -s https://acme-install.netlify.app/acme.sh -o /root/.acme.sh/acme.sh
     chmod +x /root/.acme.sh/acme.sh
     /root/.acme.sh/acme.sh --upgrade --auto-upgrade
-    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+
+    /root/.acme.sh/acme.sh --set-default-ca $acme_server
+
     while true; do
-        if /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256; then
+        if /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256 $acme_server; then
             break
         else
             echo -e "\e[91m[ERROR] Gagal mendapatkan SSL untuk $domain! Silakan coba lagi.\e[0m"
@@ -322,7 +336,7 @@ function pasang_ssl() {
             echo "$domain" > /root/domain
         fi
     done
-    if ~/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc; then
+    if /root/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc; then
         chmod 777 /etc/xray/xray.key
         print_success "SSL Certificate berhasil dipasang untuk $domain"
     else
