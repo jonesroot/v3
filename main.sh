@@ -282,6 +282,56 @@ curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$T
 }
 clear
 function pasang_ssl() {
+    clear
+    print_install "Memasang SSL Pada Domain"
+    rm -rf /etc/xray/xray.key
+    rm -rf /etc/xray/xray.crt
+    while true; do
+        if [[ -f /root/domain ]]; then
+            domain=$(cat /root/domain)
+        else
+            echo -e "\e[91m[ERROR] File /root/domain tidak ditemukan!\e[0m"
+            read -p "Masukkan domain Anda: " domain
+            echo "$domain" > /root/domain
+        fi
+        
+        if [[ -n "$domain" ]]; then
+            break
+        else
+            echo -e "\e[91m[ERROR] Domain tidak boleh kosong! Silakan coba lagi.\e[0m"
+        fi
+    done
+    STOPWEBSERVER=$(lsof -i:80 | awk 'NR==2 {print $1}')
+    if [[ -n "$STOPWEBSERVER" ]]; then
+        systemctl stop "$STOPWEBSERVER"
+    fi
+    systemctl stop nginx
+    rm -rf /root/.acme.sh
+    mkdir /root/.acme.sh
+    curl -s https://acme-install.netlify.app/acme.sh -o /root/.acme.sh/acme.sh
+    chmod +x /root/.acme.sh/acme.sh
+    /root/.acme.sh/acme.sh --upgrade --auto-upgrade
+    /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
+    while true; do
+        if /root/.acme.sh/acme.sh --issue -d "$domain" --standalone -k ec-256; then
+            break
+        else
+            echo -e "\e[91m[ERROR] Gagal mendapatkan SSL untuk $domain! Silakan coba lagi.\e[0m"
+            read -p "Masukkan domain baru: " domain
+            echo "$domain" > /root/domain
+        fi
+    done
+    if ~/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc; then
+        chmod 777 /etc/xray/xray.key
+        print_success "SSL Certificate berhasil dipasang untuk $domain"
+    else
+        echo -e "\e[91m[ERROR] Gagal memasang SSL Certificate!\e[0m"
+        exit 1
+    fi
+}
+
+"""
+function pasang_ssl() {
 clear
 print_install "Memasang SSL Pada Domain"
 rm -rf /etc/xray/xray.key
@@ -301,6 +351,7 @@ chmod +x /root/.acme.sh/acme.sh
 chmod 777 /etc/xray/xray.key
 print_success "SSL Certificate"
 }
+"""
 function make_folder_xray() {
 rm -rf /etc/vmess/.vmess.db
 rm -rf /etc/vless/.vless.db
