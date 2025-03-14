@@ -15,11 +15,11 @@ echo -e " "
 read -r -p "SUBDOMAIN :  " domen
 echo -e ""
 
-DOMAIN="zvx.my.id"
+DOMAIN=$(python3 -c 'import os; print(os.getenv("DOMAIN", "zvx.my.id"))')
 SUBDOMAIN="${domen}.${DOMAIN}"
 
-CF_ID="mezzqueen293@gmail.com"
-CF_KEY="e03f30d53ad7ec2ab54327baa5e2da5ab44f0"
+CF_ID=$(python3 -c 'import os; print(os.getenv("CF_ID", "mezzqueen293@gmail.com"))')
+CF_KEY=$(python3 -c 'import os; print(os.getenv("CF_KEY", "e03f30d53ad7ec2ab54327baa5e2da5ab44f0"))')
 
 
 IP=$(wget -qO- icanhazip.com)
