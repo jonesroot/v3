@@ -20,7 +20,7 @@ NC='\e[0m'
 red='\e[1;31m'
 green='\e[0;32m'
 TIME=$(date '+%d %b %Y')
-ipsaya=$(wget -qO- ipinfo.io/ip)
+VPSIP=$(wget -qO- ipinfo.io/ip)
 TIMES="10"
 CHATID=$(python3 -c 'import os; print(os.getenv("CHATID", ""))')
 BOT_TOKEN=$(python3 -c 'import os; print(os.getenv("BOT_TOKEN", ""))')
@@ -48,7 +48,7 @@ else
 echo -e "${EROR} Your OS Is Not Supported ( ${YELLOW}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
 exit 1
 fi
-if [[ $ipsaya == "" ]]; then
+if [[ $VPSIP == "" ]]; then
 echo -e "${EROR} IP Address ( ${RED}Not Detected${NC} )"
 else
 echo -e "${OK} IP Address ( ${green}$IP${NC} )"
@@ -264,8 +264,8 @@ fi
 }
 clear
 restart_system() {
-USRSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $ipsaya | awk '{print $2}')
-EXPSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $ipsaya | awk '{print $3}')
+USRSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $VPSIP | awk '{print $2}')
+EXPSC=$(wget -qO- https://raw.githubusercontent.com/Tomketstore/izin/main/ip | grep $VPSIP | awk '{print $3}')
 TIMEZONE=$(printf '%(%H:%M:%S)T')
 TEXT="
 <code>────────────────────</code>
@@ -275,7 +275,7 @@ TEXT="
 <code>Domain : </code><code>$domain</code>
 <code>Date   : </code><code>$TIME</code>
 <code>Time   : </code><code>$TIMEZONE</code>
-<code>Ip vps : </code><code>$ipsaya</code>
+<code>Ip vps : </code><code>$VPSIP</code>
 <code>Exp Sc : </code><code>$EXPSC</code>
 <code>────────────────────</code>
 <i>Automatic Notification from Github</i>
