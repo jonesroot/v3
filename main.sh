@@ -22,9 +22,9 @@ green='\e[0;32m'
 TIME=$(date '+%d %b %Y')
 ipsaya=$(wget -qO- ipinfo.io/ip)
 TIMES="10"
-CHATID=int(os.getenv("CHATID", ""))
-BOT_TOKEN=os.getenv("BOT_TOKEN", "")
-URL="https://api.telegram.org/bot$BOT_TOKEN/sendMessage"
+CHATID=$(python3 -c 'import os; print(os.getenv("CHATID", ""))')
+BOT_TOKEN=$(python3 -c 'import os; print(os.getenv("BOT_TOKEN", ""))')
+URL="https://api.telegram.org/bot${BOT_TOKEN}/sendMessage"
 clear
 export IP=$( curl -sS icanhazip.com )
 clear
