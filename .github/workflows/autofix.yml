@@ -1,20 +1,62 @@
-name: Auto Fix Python Syntax and Shell Scripts
+name: Auto Fix
 
 on: [push]
 
 jobs:
-  lint:
+  auto-fix:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: AIOLint Linter
-        uses: jonesroot/aiolint-action@3a30eab445b206419b618783cf3e8bd58f9c4ef9
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort autoflake flake8
+          sudo apt-get update
+          sudo apt-get install -y shellcheck shfmt
+
+      - name: Auto Fix Python Files
+        run: |
+          black --exclude=venv .
+          isort --skip-glob='**/venv/**' .
+          autoflake --in-place --recursive --remove-all-unused-imports --remove-unused-variables --ignore-init-module-imports .
+          for file in $(find . -name '*.py'); do
+            flake8 "$file" --count --select=E9,F63,F7,F82 --show-source --statistics --extend-ignore=E203,W503 || echo "flake8 error in $file"
+          done
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+      - name: Lint & Fix Shell Scripts (with or without .sh)
+        run: |
+          shell_files=$(find . -type f \( -name "*.sh" -o -exec file {} \; | grep 'shell script' | cut -d: -f1 \))
+
+          if [ -n "$shell_files" ]; then
+            echo "Linting and formatting shell scripts..."
+            echo "$shell_files" | xargs -d '\n' shellcheck || true
+            echo "$shell_files" | xargs -d '\n' shfmt -w -i 2
+          else
+            echo "No shell scripts found."
+          fi
+
+      - name: Check for changes
+        id: git-diff
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            echo "changed=false" >> $GITHUB_ENV
+          else
+            echo "Changes detected."
+            echo "changed=true" >> $GITHUB_ENV
+          fi
 
       - name: Auto Commit Changes
         if: env.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Auto Fix & Lint Bash via shfmt"
+          commit_message: "Auto Fix: Python & Shell Scripts"
           commit_options: "--no-verify"
