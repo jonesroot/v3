@@ -10,7 +10,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: AIOLint Linter
-        uses: jonesroot/aiolint-action
+        uses: jonesroot/aiolint-action@3a30eab445b206419b618783cf3e8bd58f9c4ef9
 
       - name: Auto Commit Changes
         if: env.changed == 'true'
