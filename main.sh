@@ -22,9 +22,9 @@ green='\e[0;32m'
 TIME=$(date '+%d %b %Y')
 ipsaya=$(wget -qO- ipinfo.io/ip)
 TIMES="10"
-CHATID="1962241851"
-KEY="6866097221:AAFdDsbTF-R7_d07ewI3z0BQHYrd7yQNhhA"
-URL="https://api.telegram.org/bot$KEY/sendMessage"
+CHATID=int(os.getenv("CHATID", ""))
+BOT_TOKEN=os.getenv("BOT_TOKEN", "")
+URL="https://api.telegram.org/bot$BOT_TOKEN/sendMessage"
 clear
 export IP=$( curl -sS icanhazip.com )
 clear
@@ -279,7 +279,7 @@ TEXT="
 <code>Exp Sc : </code><code>$EXPSC</code>
 <code>────────────────────</code>
 <i>Automatic Notification from Github</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://t.me/ARI_VPN_STORE"},{"text":"Contack","url":"https://wa.me/6281327393959"}]]}'
+"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://t.me/ARI_VPN_STORE"},{"text":"Contact","url":"https://wa.me/6281327393959"}]]}'
 curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 }
 clear
