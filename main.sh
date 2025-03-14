@@ -229,6 +229,7 @@ print_success "Packet Yang Dibutuhkan"
 }
 clear
 function pasang_domain() {
+clear
 echo -e ""
 clear
 echo -e "    _______________________________"
