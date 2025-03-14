@@ -304,15 +304,6 @@ function pasang_ssl() {
         fi
     done
 
-    limit_check=$(curl -s "https://letsencrypt.org/docs/rate-limits/" | grep -oP '(?<=Certificates per Registered Domain\s*</td>\s*<td>)[^<]+')
-
-    if [[ "$limit_check" -ge 5 ]]; then
-        echo -e "\e[91m[ERROR] Domain terkena limit Let's Encrypt! Menggunakan ZeroSSL sebagai alternatif...\e[0m"
-        acme_server="--server zerossl"
-    else
-        acme_server="--server letsencrypt"
-    fi
-
     STOPWEBSERVER=$(lsof -i:80 | awk 'NR==2 {print $1}')
     if [[ -n "$STOPWEBSERVER" ]]; then
         systemctl stop "$STOPWEBSERVER"
@@ -325,6 +316,15 @@ function pasang_ssl() {
     chmod +x /root/.acme.sh/acme.sh
     /root/.acme.sh/acme.sh --upgrade --auto-upgrade
 
+    limit_check=$(curl -s "https://letsencrypt.org/docs/rate-limits/" | grep -oP '(?<=Certificates per Registered Domain\s*</td>\s*<td>)[^<]+')
+
+    if [[ "$limit_check" -ge 5 ]]; then
+        echo -e "\e[91m[ERROR] Domain terkena limit Let's Encrypt! Menggunakan ZeroSSL sebagai alternatif...\e[0m"
+        acme_server="--server zerossl"
+    else
+        acme_server="--server letsencrypt"
+    fi
+
     /root/.acme.sh/acme.sh --set-default-ca $acme_server
 
     while true; do
@@ -336,6 +336,7 @@ function pasang_ssl() {
             echo "$domain" > /root/domain
         fi
     done
+
     if /root/.acme.sh/acme.sh --installcert -d "$domain" --fullchainpath /etc/xray/xray.crt --keypath /etc/xray/xray.key --ecc; then
         chmod 777 /etc/xray/xray.key
         print_success "SSL Certificate berhasil dipasang untuk $domain"
