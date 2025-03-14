@@ -17,31 +17,6 @@ jobs:
       - name: AIOLint Linter
         uses: jonesroot/aiolint-action@1.0.0-beta
 
-      - name: Run ShellCheck
-        run: |
-          find . -type f -name "*.sh" -exec shellcheck {} +
-
-      - name: Format Shell Scripts with shfmt
-        run: |
-          find . -type f -name "*.sh" -exec shfmt -w -i 2 {} +
-
-      - name: Setup Rust (with --force)
-        run: |
-          rustup update
-          rustup component add rustfmt clippy
-          rustup component add rustfmt --force
-
-      - name: Check for changes
-        id: git-diff
-        run: |
-          if git diff --quiet; then
-            echo "No changes to commit."
-            echo "changed=false" >> $GITHUB_ENV
-          else
-            echo "Changes detected."
-            echo "changed=true" >> $GITHUB_ENV
-          fi
-
       - name: Auto Commit Changes
         if: env.changed == 'true'
         uses: stefanzweifel/git-auto-commit-action@v4
