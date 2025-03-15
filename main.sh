@@ -692,10 +692,10 @@ function ins_Fail2ban(){
 clear
 print_install "Menginstall Fail2ban"
 if [ -d '/usr/local/ddos' ]; then
-rm -rf /usr/local/ddos
 else
 mkdir /usr/local/ddos
 fi
+apt install -y fail2ban
 clear
 echo "Banner /etc/banner.txt" >>/etc/ssh/sshd_config
 sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/banner.txt"@g' /etc/default/dropbear
