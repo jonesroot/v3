@@ -692,8 +692,7 @@ function ins_Fail2ban(){
 clear
 print_install "Menginstall Fail2ban"
 if [ -d '/usr/local/ddos' ]; then
-echo; echo; echo "Please un-install the previous version first"
-exit 0
+rm -rf /usr/local/ddos
 else
 mkdir /usr/local/ddos
 fi
