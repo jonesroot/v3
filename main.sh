@@ -774,15 +774,33 @@ rm -f /root/cert.pem
 print_success "All Packet"
 }
 function menu(){
-clear
-print_install "Memasang Menu Packet"
-wget ${REPO}/Features/menu.zip
-unzip menu.zip
-chmod +x menu/*
-mv menu/* /usr/local/sbin
-rm -rf menu
-rm -rf menu.zip
+    clear
+    print_install "Memasang Menu Packet"
+
+    if ! command -v wget &>/dev/null; then
+        apt install -y wget
+    fi
+
+    if ! command -v unzip &>/dev/null; then
+        apt install -y unzip
+    fi
+
+    if [ -z "$REPO" ]; then
+        echo "Variabel REPO tidak didefinisikan. Pastikan URL REPO diatur."
+        exit 1
+    fi
+
+    wget ${REPO}/Features/menu.zip -O ~/menu.zip
+    unzip -q ~/menu.zip
+    chmod +x ~/menu/*
+    mv ~/menu/* /usr/local/sbin
+
+    rm -rf ~/menu
+    rm -rf ~/menu.zip
+
+    echo "Menu Packet berhasil dipasang."
 }
+
 function profile(){
 clear
 cat >/root/.profile <<EOF
